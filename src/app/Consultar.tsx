@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useResiduos, type Residuos } from '../database/useResiduos';
 import { format } from 'date-fns';
@@ -9,6 +9,7 @@ import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import { router } from 'expo-router';
 import { useNavigation } from "expo-router";
+import { useTheme } from '../context/ThemeContext';
 
 type CategoryStats = {
   category: string;
@@ -18,6 +19,7 @@ type CategoryStats = {
 };
 
 export default function Consultar() {
+  const { isDarkMode, fontSize } = useTheme();
   const { consultar } = useResiduos();
   const [items, setItems] = useState<Residuos[]>([]);
   const [categoryStats, setCategoryStats] = useState<CategoryStats[]>([]);
@@ -174,38 +176,45 @@ export default function Consultar() {
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>Carregando dados...</Text>
+      <View style={[styles.container, isDarkMode && styles.containerDark]}>
+        <Text style={[styles.loadingText, isDarkMode && styles.textDark]}>Carregando dados...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isDarkMode && styles.containerDark]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Relatório de Resíduos</Text>
+      <View style={[styles.header, isDarkMode && styles.headerDark]}>
+        <View style={styles.headerTitleContainer}>
+          <Image 
+            source={require('../../assets/images/logo.png')}
+            style={styles.headerLogo}
+            resizeMode="contain"
+          />
+          <Text style={[styles.title, isDarkMode && styles.textDark, { fontSize: fontSize + 4 }]}>Relatório de Resíduos</Text>
+        </View>
         <TouchableOpacity onPress={loadData} style={styles.refreshButton}>
-          <Icon name="refresh" size={24} color="#3b82f6" />
+          <Icon name="refresh" size={24} color={isDarkMode ? '#fff' : '#3b82f6'} />
         </TouchableOpacity>
       </View>
 
       {/* Summary Card */}
-      <View style={styles.summaryCard}>
+      <View style={[styles.summaryCard, isDarkMode && styles.cardDark]}>
         <View style={styles.summaryItem}>
-          <Icon name="scale" size={24} color="#3b82f6" />
-          <Text style={styles.summaryValue}>{totalWeight.toFixed(2)} Kg</Text>
-          <Text style={styles.summaryLabel}>Peso Total</Text>
+          <Icon name="scale" size={24} color={isDarkMode ? '#fff' : '#3b82f6'} />
+          <Text style={[styles.summaryValue, isDarkMode && styles.textDark, { fontSize: fontSize + 2 }]}>{totalWeight.toFixed(2)} Kg</Text>
+          <Text style={[styles.summaryLabel, isDarkMode && styles.textDark, { fontSize }]}>Peso Total</Text>
         </View>
         <View style={styles.summaryItem}>
-          <Icon name="counter" size={24} color="#3b82f6" />
-          <Text style={styles.summaryValue}>{items.length}</Text>
-          <Text style={styles.summaryLabel}>Registros</Text>
+          <Icon name="counter" size={24} color={isDarkMode ? '#fff' : '#3b82f6'} />
+          <Text style={[styles.summaryValue, isDarkMode && styles.textDark, { fontSize: fontSize + 2 }]}>{items.length}</Text>
+          <Text style={[styles.summaryLabel, isDarkMode && styles.textDark, { fontSize }]}>Registros</Text>
         </View>
         <View style={styles.summaryItem}>
-          <Icon name="tag-multiple" size={24} color="#3b82f6" />
-          <Text style={styles.summaryValue}>{categoryStats.length}</Text>
-          <Text style={styles.summaryLabel}>Categorias</Text>
+          <Icon name="tag-multiple" size={24} color={isDarkMode ? '#fff' : '#3b82f6'} />
+          <Text style={[styles.summaryValue, isDarkMode && styles.textDark, { fontSize: fontSize + 2 }]}>{categoryStats.length}</Text>
+          <Text style={[styles.summaryLabel, isDarkMode && styles.textDark, { fontSize }]}>Categorias</Text>
         </View>
       </View>
 
@@ -213,30 +222,30 @@ export default function Consultar() {
       <View style={styles.reportButtons}>
         <TouchableOpacity style={styles.reportButton} onPress={generateExcelReport}>
           <Icon name="microsoft-excel" size={24} color="#fff" />
-          <Text style={styles.reportButtonText}>Excel</Text>
+          <Text style={[styles.reportButtonText, { fontSize }]}>Excel</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.reportButton} onPress={generatePDFReport}>
           <Icon name="file-pdf-box" size={24} color="#fff" />
-          <Text style={styles.reportButtonText}>PDF</Text>
+          <Text style={[styles.reportButtonText, { fontSize }]}>PDF</Text>
         </TouchableOpacity>
       </View>
 
       {/* Categories List */}
       <ScrollView style={styles.categoriesList} contentContainerStyle={styles.categoriesListContent}>
         {categoryStats.map((stat, index) => (
-          <View key={index} style={styles.categoryCard}>
+          <View key={index} style={[styles.categoryCard, isDarkMode && styles.cardDark]}>
             <View style={styles.categoryHeader}>
-              <Text style={styles.categoryName}>{stat.category}</Text>
-              <Text style={styles.categoryWeight}>{stat.totalWeight.toFixed(2)} Kg</Text>
+              <Text style={[styles.categoryName, isDarkMode && styles.textDark, { fontSize: fontSize + 1 }]}>{stat.category}</Text>
+              <Text style={[styles.categoryWeight, isDarkMode && styles.textDark, { fontSize: fontSize + 1 }]}>{stat.totalWeight.toFixed(2)} Kg</Text>
             </View>
             <View style={styles.categoryDetails}>
               <View style={styles.categoryDetail}>
-                <Icon name="counter" size={16} color="#666" />
-                <Text style={styles.categoryDetailText}>{stat.count} registros</Text>
+                <Icon name="counter" size={16} color={isDarkMode ? '#999' : '#666'} />
+                <Text style={[styles.categoryDetailText, isDarkMode && styles.textDark, { fontSize }]}>{stat.count} registros</Text>
               </View>
               <View style={styles.categoryDetail}>
-                <Icon name="calendar" size={16} color="#666" />
-                <Text style={styles.categoryDetailText}>
+                <Icon name="calendar" size={16} color={isDarkMode ? '#999' : '#666'} />
+                <Text style={[styles.categoryDetailText, isDarkMode && styles.textDark, { fontSize }]}>
                   Último: {format(stat.lastDate, 'dd/MM/yyyy')}
                 </Text>
               </View>
@@ -246,18 +255,18 @@ export default function Consultar() {
       </ScrollView>
 
       {/* Bottom Menu */}
-      <View style={styles.bottomMenu}>
+      <View style={[styles.bottomMenu, isDarkMode && styles.bottomMenuDark]}>
         <TouchableOpacity onPress={() => handleTab('Index')}>
-          <Icon name="home" size={28} color="#222" />
-          <Text style={styles.menuLabel}>Home</Text>
+          <Icon name="home" size={28} color={isDarkMode ? '#fff' : '#222'} />
+          <Text style={[styles.menuLabel, isDarkMode && styles.menuLabelDark, { fontSize: fontSize - 2 }]}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleTab('Consultar')}>
-          <Icon name="file-document-outline" size={28} color="#3b82f6" />
-          <Text style={styles.menuLabelSelected}>Consultar</Text>
+          <Icon name="file-document-outline" size={28} color={isDarkMode ? '#3b82f6' : '#3b82f6'} />
+          <Text style={[styles.menuLabelSelected, isDarkMode && styles.menuLabelSelectedDark, { fontSize: fontSize - 2 }]}>Consultar</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleTab('Configurar')}>
-          <Icon name="cog-outline" size={28} color="#222" />
-          <Text style={styles.menuLabel}>Ajustes</Text>
+          <Icon name="cog-outline" size={28} color={isDarkMode ? '#fff' : '#222'} />
+          <Text style={[styles.menuLabel, isDarkMode && styles.menuLabelDark, { fontSize: fontSize - 2 }]}>Ajustes</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -269,6 +278,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fdf6e3',
   },
+  headerTitleContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center' 
+  },
+  headerLogo: {
+     width: 45, 
+     height: 45, 
+     marginRight: 8 
+    },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -397,5 +415,26 @@ const styles = StyleSheet.create({
     color: '#3b82f6',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  containerDark: {
+    backgroundColor: '#1a1a1a',
+  },
+  headerDark: {
+    backgroundColor: '#2d2d2d',
+  },
+  textDark: {
+    color: '#fff',
+  },
+  cardDark: {
+    backgroundColor: '#2d2d2d',
+  },
+  bottomMenuDark: {
+    backgroundColor: '#2d2d2d',
+  },
+  menuLabelDark: {
+    color: '#fff',
+  },
+  menuLabelSelectedDark: {
+    color: '#3b82f6',
   },
 });

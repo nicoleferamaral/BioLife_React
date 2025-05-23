@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Modal, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Modal, Platform, Alert, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useResiduos, type Residuos } from '../database/useResiduos';
 import { useRouter } from 'expo-router';
+import { useTheme } from '../context/ThemeContext';
 
 const CATEGORIES = [
   'Outra',
@@ -32,6 +33,7 @@ const CATEGORIES = [
 const router = useRouter();
 
 export default function Index() {
+  const { isDarkMode, fontSize } = useTheme();
   const { create, consultar, remove, atualizar } = useResiduos();
   const [search, setSearch] = useState('');
   const [items, setItems] = useState<Residuos[]>([]);
@@ -195,13 +197,10 @@ export default function Index() {
   const handleTab = (screen: string) => {
     switch (screen) {
       case 'Index':
-        router.push('/');
+        router.push('/Index');
         break;
       case 'Consultar':
         router.push('/Consultar');
-        break;
-      case 'Baixar':
-        router.push('/Baixar');
         break;
       case 'Configurar':
         router.push('/Configurar');
@@ -303,29 +302,37 @@ export default function Index() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isDarkMode && styles.containerDark]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Registros</Text>
+      <View style={[styles.header, isDarkMode && styles.headerDark]}>
+        <View style={styles.headerTitleContainer}>
+          <Image 
+            source={require('../../assets/images/logo.png')}
+            style={styles.headerLogo}
+            resizeMode="contain"
+          />
+          <Text style={[styles.title, isDarkMode && styles.titleDark, { fontSize: fontSize + 4 }]}>Registros</Text>
+        </View>
         <TouchableOpacity onPress={handleHelp} style={styles.iconButton}>
-          <Icon name="help-circle-outline" size={28} color="#222" />
+          <Icon name="help-circle-outline" size={28} color={isDarkMode ? '#fff' : '#222'} />
         </TouchableOpacity>
       </View>
 
       {/* Search and filter */}
-      <View style={styles.searchRow}>
+      <View style={[styles.searchRow, isDarkMode && styles.searchRowDark]}>
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, isDarkMode && styles.searchInputDark, { fontSize }]}
           placeholder="Buscar"
+          placeholderTextColor={isDarkMode ? '#999' : '#666'}
           value={search}
           onChangeText={setSearch}
           onSubmitEditing={handleSearch}
         />
         <TouchableOpacity onPress={handleSearch} style={styles.iconButton}>
-          <Icon name="magnify" size={26} color="#222" />
+          <Icon name="magnify" size={26} color={isDarkMode ? '#fff' : '#222'} />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleFilter} style={styles.iconButton}>
-          <Icon name="tune" size={26} color="#222" />
+          <Icon name="tune" size={26} color={isDarkMode ? '#fff' : '#222'} />
         </TouchableOpacity>
       </View>
 
@@ -335,16 +342,32 @@ export default function Index() {
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={{ flexGrow: 1 }}
         renderItem={({ item }) => (
-          <View style={styles.itemBox}>
+          <View style={[styles.itemBox, isDarkMode && styles.itemBoxDark]}>
             <View style={styles.itemContent}>
               <View style={styles.itemLeft}>
-                <Text style={styles.itemDate}>
+                <Text style={[
+                  styles.itemDate, 
+                  isDarkMode && styles.textDark,
+                  { fontSize: fontSize - 2 }
+                ]}>
                   {format(new Date(item.data), "dd/MM/yyyy", { locale: ptBR })}
                 </Text>
-                <Text style={styles.itemType}>{item.categoria}</Text>
+                <Text style={[
+                  styles.itemType, 
+                  isDarkMode && styles.textDark,
+                  { fontSize }
+                ]}>
+                  {item.categoria}
+                </Text>
               </View>
               <View style={styles.itemRight}>
-                <Text style={styles.itemWeight}>{item.peso}Kg</Text>
+                <Text style={[
+                  styles.itemWeight, 
+                  isDarkMode && styles.textDark,
+                  { fontSize }
+                ]}>
+                  {item.peso}Kg
+                </Text>
                 <View style={styles.actionButtons}>
                   <TouchableOpacity onPress={() => handleEdit(item)} style={styles.actionButton}>
                     <Icon name="pencil" size={20} color="#3b82f6" />
@@ -359,14 +382,20 @@ export default function Index() {
         )}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Nenhum registro encontrado</Text>
+            <Text style={[
+              styles.emptyText, 
+              isDarkMode && styles.textDark,
+              { fontSize }
+            ]}>
+              Nenhum registro encontrado
+            </Text>
           </View>
         }
       />
 
       {/* Criar+ Button */}
       <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
-        <Text style={styles.createButtonText}>Criar+</Text>
+        <Text style={[styles.createButtonText, { fontSize }]}>Criar+</Text>
       </TouchableOpacity>
 
       {/* Modal de criação */}
@@ -602,19 +631,18 @@ export default function Index() {
       </Modal>
 
       {/* Bottom Menu */}
-      <View style={styles.bottomMenu}>
+      <View style={[styles.bottomMenu, isDarkMode && styles.bottomMenuDark]}>
         <TouchableOpacity onPress={() => handleTab('Index')}>
-          <Icon name="home" size={28} color="#3b82f6" />
-          <Text style={styles.menuLabelSelected}>Home</Text>
+          <Icon name="home" size={28} color={isDarkMode ? '#3b82f6' : '#3b82f6'} />
+          <Text style={[styles.menuLabelSelected, isDarkMode && styles.menuLabelSelectedDark, { fontSize: fontSize - 2 }]}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleTab('Consultar')}>
-          <Icon name="file-document-outline" size={28} color="#222" />
-          <Text style={styles.menuLabel}>Consultar</Text>
+          <Icon name="file-document-outline" size={28} color={isDarkMode ? '#fff' : '#222'} />
+          <Text style={[styles.menuLabel, isDarkMode && styles.menuLabelDark, { fontSize: fontSize - 2 }]}>Consultar</Text>
         </TouchableOpacity>
-   
         <TouchableOpacity onPress={() => handleTab('Configurar')}>
-          <Icon name="cog-outline" size={28} color="#222" />
-          <Text style={styles.menuLabel}>Ajustes</Text>
+          <Icon name="cog-outline" size={28} color={isDarkMode ? '#fff' : '#222'} />
+          <Text style={[styles.menuLabel, isDarkMode && styles.menuLabelDark, { fontSize: fontSize - 2 }]}>Ajustes</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -622,12 +650,52 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fdf6e3' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#c6efc6', paddingTop: 40, paddingHorizontal: 16, paddingBottom: 8 },
-  title: { fontSize: 26, fontWeight: 'bold', color: '#222' },
-  iconButton: { marginLeft: 8 },
-  searchRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#c6efc6', paddingHorizontal: 16, paddingBottom: 8 },
-  searchInput: { flex: 1, backgroundColor: '#fff', borderRadius: 20, paddingHorizontal: 16, height: 36, marginRight: 8, fontSize: 16 },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#fdf6e3' 
+  },
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    backgroundColor: '#c6efc6', 
+    paddingTop: 40, 
+    paddingHorizontal: 16, 
+    paddingBottom: 8 
+  },
+  headerTitleContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center' 
+  },
+  headerLogo: { 
+    width: 45, 
+    height: 45, 
+    marginRight: 8 
+  },
+  title: { 
+    fontSize: 26, 
+    fontWeight: 'bold', 
+    color: '#222' 
+  },
+  iconButton: { 
+    marginLeft: 8 
+  },
+  searchRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#c6efc6', 
+    paddingHorizontal: 16, 
+    paddingBottom: 8 
+  },
+  searchInput: { 
+    flex: 1, 
+    backgroundColor: '#fff', 
+    borderRadius: 20, 
+    paddingHorizontal: 16, 
+    height: 36, 
+    marginRight: 8, 
+    fontSize: 16 
+  },
   itemBox: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -673,31 +741,154 @@ const styles = StyleSheet.create({
     padding: 6,
     marginLeft: 4,
   },
-  createButton: { position: 'absolute', right: 24, bottom: 80, backgroundColor: '#3b82f6', borderRadius: 32, paddingVertical: 14, paddingHorizontal: 24, elevation: 2 },
-  createButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
-  bottomMenu: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', backgroundColor: '#c6efc6', paddingVertical: 8, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
-  menuLabel: { fontSize: 13, color: '#222', textAlign: 'center' },
-  menuLabelSelected: { fontSize: 13, color: '#3b82f6', fontWeight: 'bold', textAlign: 'center' },
+  createButton: { 
+    position: 'absolute', 
+    right: 24, 
+    bottom: 80, 
+    backgroundColor: '#3b82f6', 
+    borderRadius: 32, 
+    paddingVertical: 14, 
+    paddingHorizontal: 24, 
+    elevation: 2 
+  },
+  createButtonText: { 
+    color: '#fff', 
+    fontWeight: 'bold', 
+    fontSize: 18 
+  },
+  bottomMenu: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-around', 
+    alignItems: 'center', 
+    backgroundColor: '#c6efc6', 
+    paddingVertical: 8, 
+    borderTopLeftRadius: 20, 
+    borderTopRightRadius: 20 
+  },
+  menuLabel: { 
+    fontSize: 13, 
+    color: '#222', 
+    textAlign: 'center' 
+  },
+  menuLabelSelected: { 
+    fontSize: 13, 
+    color: '#3b82f6', 
+    fontWeight: 'bold', 
+    textAlign: 'center' 
+  },
   // Modal styles
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.2)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { width: '90%', backgroundColor: '#fff', borderRadius: 20, padding: 20, elevation: 5 },
-  modalTitle: { fontSize: 22, fontWeight: 'bold', color: '#3b82f6', marginBottom: 12, textAlign: 'center' },
-  modalLabel: { fontSize: 16, fontWeight: 'bold', marginTop: 10, marginBottom: 4, color: '#222' },
-  dateInput: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f0f0f0', borderRadius: 12, padding: 10, marginBottom: 4 },
-  categoriesContainer: { flexDirection: 'row', marginVertical: 6 },
-  categoryButton: { backgroundColor: '#e0e7ef', borderRadius: 16, paddingVertical: 6, paddingHorizontal: 14, marginRight: 8 },
-  categoryButtonSelected: { backgroundColor: '#3b82f6' },
-  categoryText: { color: '#222', fontSize: 14 },
-  categoryTextSelected: { color: '#fff', fontWeight: 'bold' },
-  otherInputRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
-  otherInput: { flex: 1, backgroundColor: '#f0f0f0', borderRadius: 12, padding: 10, fontSize: 15 },
-  addOtherButton: { backgroundColor: '#3b82f6', borderRadius: 12, padding: 8, marginLeft: 8 },
-  weightInput: { backgroundColor: '#f0f0f0', borderRadius: 12, padding: 10, fontSize: 15, marginTop: 4, marginBottom: 10 },
-  modalButtonsRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 16 },
-  cancelButton: { paddingVertical: 10, paddingHorizontal: 18, borderRadius: 12, backgroundColor: '#eee', marginRight: 10 },
-  cancelButtonText: { color: '#222', fontWeight: 'bold', fontSize: 16 },
-  saveButton: { paddingVertical: 10, paddingHorizontal: 18, borderRadius: 12, backgroundColor: '#3b82f6' },
-  saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  modalOverlay: { 
+    flex: 1, 
+    backgroundColor: 'rgba(0,0,0,0.2)', 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  modalContent: { 
+    width: '90%', 
+    backgroundColor: '#fff', 
+    borderRadius: 20, 
+    padding: 20, 
+    elevation: 5 
+  },
+  modalTitle: { 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    color: '#3b82f6', 
+    marginBottom: 12, 
+    textAlign: 'center' 
+  },
+  modalLabel: { 
+    fontSize: 16, 
+    fontWeight: 'bold', 
+    marginTop: 10, 
+    marginBottom: 4, 
+    color: '#222' 
+  },
+  dateInput: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between', 
+    backgroundColor: '#f0f0f0', 
+    borderRadius: 12, 
+    padding: 10, 
+    marginBottom: 4 
+  },
+  categoriesContainer: { 
+    flexDirection: 'row', 
+    marginVertical: 6 
+  },
+  categoryButton: { 
+    backgroundColor: '#e0e7ef', 
+    borderRadius: 16, 
+    paddingVertical: 6, 
+    paddingHorizontal: 14, 
+    marginRight: 8 
+  },
+  categoryButtonSelected: { 
+    backgroundColor: '#3b82f6'
+   },
+  categoryText: { 
+    color: '#222', 
+    fontSize: 14 
+  },
+  categoryTextSelected: { 
+    color: '#fff', 
+    fontWeight: 'bold' 
+  },
+  otherInputRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginTop: 6 
+  },
+  otherInput: { 
+    flex: 1, 
+    backgroundColor: '#f0f0f0', 
+    borderRadius: 12, 
+    padding: 10, 
+    fontSize: 15 
+  },
+  addOtherButton: { 
+    backgroundColor: '#3b82f6', 
+    borderRadius: 12, 
+    padding: 8, 
+    marginLeft: 8 
+  },
+  weightInput: { 
+    backgroundColor: '#f0f0f0',
+     borderRadius: 12, 
+     padding: 10, 
+     fontSize: 15, 
+     marginTop: 4, 
+     marginBottom: 10 
+    },
+  modalButtonsRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'flex-end', 
+    marginTop: 16 
+  },
+  cancelButton: { 
+    paddingVertical: 10, 
+    paddingHorizontal: 18, 
+    borderRadius: 12, 
+    backgroundColor: '#eee', 
+    marginRight: 10 
+  },
+  cancelButtonText: { 
+    color: '#222', 
+    fontWeight: 'bold', 
+    fontSize: 16 
+  },
+  saveButton: { 
+    paddingVertical: 10, 
+    paddingHorizontal: 18, 
+    borderRadius: 12, 
+    backgroundColor: '#3b82f6' 
+  },
+  saveButtonText: {
+     color: '#fff', 
+     fontWeight: 'bold', 
+     fontSize: 16 
+    },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -722,5 +913,37 @@ const styles = StyleSheet.create({
   selectButtonText: {
     fontSize: 16,
     color: '#222',
+  },
+  containerDark: {
+    backgroundColor: '#1a1a1a',
+  },
+  headerDark: {
+    backgroundColor: '#2d2d2d',
+  },
+  searchRowDark: {
+    backgroundColor: '#2d2d2d',
+  },
+  searchInputDark: {
+    backgroundColor: '#404040',
+    color: '#fff',
+  },
+  itemBoxDark: {
+    backgroundColor: '#2d2d2d',
+    borderColor: '#404040',
+  },
+  textDark: {
+    color: '#fff',
+  },
+  bottomMenuDark: {
+    backgroundColor: '#2d2d2d',
+  },
+  menuLabelDark: {
+    color: '#fff',
+  },
+  menuLabelSelectedDark: {
+    color: '#3b82f6',
+  },
+  titleDark: {
+    color: '#fff',
   },
 });
