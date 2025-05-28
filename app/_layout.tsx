@@ -1,7 +1,7 @@
-import { initializeDataBase } from "@/database/initializeDataBase";
+import { initializeDataBase } from "@/src/database/initializeDataBase";
 import { Stack } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
-import { ThemeProvider } from '../context/ThemeContext';
+import { ThemeProvider } from '../src/context/ThemeContext';
 
 export default function Layout() {
   return (

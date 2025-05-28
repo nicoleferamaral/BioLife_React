@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert, Im
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../src/context/ThemeContext';
 
 export default function Configurar() {
   const router = useRouter();
@@ -74,7 +74,7 @@ export default function Configurar() {
       <View style={[styles.header, isDarkMode && styles.headerDark]}>
         <View style={styles.headerTitleContainer}>
             <Image 
-              source={require('../../assets/images/logo.png')}
+              source={require('../assets/images/logo.png')}
               style={styles.headerLogo}
               resizeMode="contain"
             />

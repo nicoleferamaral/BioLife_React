@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "myapp",
+    "name": "BioLife",
     "slug": "myapp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.nicoleferreira.myapp"
     },
     "web": {
       "bundler": "metro",
@@ -38,6 +39,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "28c3c7a9-03c0-4593-a847-36e3a6b093c1"
+      }
+    },
+    "owner": "nicoleferreira"
   }
 }

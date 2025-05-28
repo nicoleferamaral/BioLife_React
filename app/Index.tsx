@@ -4,9 +4,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useResiduos, type Residuos } from '../database/useResiduos';
+import { useResiduos, type Residuos } from '../src/database/useResiduos';
 import { useRouter } from 'expo-router';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../src/context/ThemeContext';
 
 const CATEGORIES = [
   'Outra',
@@ -307,7 +307,7 @@ export default function Index() {
       <View style={[styles.header, isDarkMode && styles.headerDark]}>
         <View style={styles.headerTitleContainer}>
           <Image 
-            source={require('../../assets/images/logo.png')}
+            source={require('../assets/images/logo.png')}
             style={styles.headerLogo}
             resizeMode="contain"
           />

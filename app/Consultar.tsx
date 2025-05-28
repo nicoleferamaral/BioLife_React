@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useResiduos, type Residuos } from '../database/useResiduos';
+import { useResiduos, type Residuos } from '../src/database/useResiduos';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import * as FileSystem from 'expo-file-system';
@@ -9,7 +9,7 @@ import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import { router } from 'expo-router';
 import { useNavigation } from "expo-router";
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../src/context/ThemeContext';
 
 type CategoryStats = {
   category: string;
@@ -188,7 +188,7 @@ export default function Consultar() {
       <View style={[styles.header, isDarkMode && styles.headerDark]}>
         <View style={styles.headerTitleContainer}>
           <Image 
-            source={require('../../assets/images/logo.png')}
+            source={require('../assets/images/logo.png')}
             style={styles.headerLogo}
             resizeMode="contain"
           />
